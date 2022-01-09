@@ -9,6 +9,8 @@ import Options.Applicative hiding (empty)
 import Syntax
 import System.Console.Haskeline
 import System.IO
+import System.Exit
+import Control.Exception
 import Text.Parsec
 import Text.Pretty.Simple
 
@@ -53,9 +55,9 @@ doTheThing Options {optCommand = ReplCommand{..}} =  do
     repl env = do
       input <- getInputLine "Rina> "
       case input of
-        Nothing   -> pure ()
-        Just ":q" -> lift $ putStrLn "Thanks for using Rina ❤️"
-        Just i    -> do
+        Nothing     -> pure ()
+        Just "quit" -> lift $ exitSuccess
+        Just i      -> do
           let parsed = parse expr "repl" $ pack i
               res    = flip (evalExpr env) VUnit <$> parsed
           case res of
@@ -70,7 +72,10 @@ doTheThing Options {optCommand = ReplCommand{..}} =  do
 
 main :: IO ()
 main = execParser opts >>= doTheThing
-  where 
+  where
+    tid <- myThreadId
+    installHandler keyboardSignal (Catch (throwTo tid ExitSuccess)) Nothing
+
     -- opts = flip info (progDesc "The essential Cat-Rina compilers and toolkits") $ 
     opts = info (optsParser <**> helper)
          $ fullDesc 
