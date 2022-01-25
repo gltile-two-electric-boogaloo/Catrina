@@ -73,9 +73,6 @@ doTheThing Options {optCommand = ReplCommand{..}} =  do
 main :: IO ()
 main = execParser opts >>= doTheThing
   where
-    tid <- myThreadId
-    installHandler keyboardSignal (Catch (throwTo tid ExitSuccess)) Nothing
-
     -- opts = flip info (progDesc "The essential Cat-Rina compilers and toolkits") $ 
     opts = info (optsParser <**> helper)
          $ fullDesc 

@@ -4,7 +4,7 @@ module Types.Categories.Base (
   base, catO'Cats
                              ) where
 
-import Data.Map
+import Data.Map hiding (compose)
 import Syntax.Expr
 import Syntax.Type
 import Types.Category
